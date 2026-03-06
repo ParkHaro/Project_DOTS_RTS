@@ -13,6 +13,7 @@ namespace DotsRts
 
         public event EventHandler OnBarracksUnitQueueChanged;
         public event EventHandler OnHQDead;
+        public event EventHandler OnHealthDead;
 
         private void Awake()
         {
@@ -26,10 +27,18 @@ namespace DotsRts
                 OnBarracksUnitQueueChanged?.Invoke(entity, EventArgs.Empty);
             }
         }
-        
+
         public void TriggerOnHQDead()
         {
             OnHQDead?.Invoke(this, EventArgs.Empty);
+        }
+        
+        public void TriggerOnHealthDead(NativeList<Entity> entityNativeList)
+        {
+            foreach (var entity in entityNativeList)
+            {
+                OnHealthDead?.Invoke(entity, EventArgs.Empty);
+            }
         }
     }
 }

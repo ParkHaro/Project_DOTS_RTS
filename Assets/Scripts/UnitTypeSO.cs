@@ -16,6 +16,7 @@ namespace DotsRts
     public class UnitTypeSO : ScriptableObject
     {
         public UnitType UnitType;
+        public Transform RagdollPrefab;
         public float ProgressMax;
         public Sprite Sprite;
         public ResourceAmount[] SpawnCostResourceAmountArray;

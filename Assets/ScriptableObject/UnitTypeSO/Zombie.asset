@@ -13,4 +13,7 @@ MonoBehaviour:
   m_Name: Zombie
   m_EditorClassIdentifier: Assembly-CSharp::DotsRts.UnitTypeSO
   UnitType: 3
+  RagdollPrefab: {fileID: 944685194496642680, guid: 64dd39be48b76ff4d8a1147aaa06f22c, type: 3}
   ProgressMax: 1
+  Sprite: {fileID: 0}
+  SpawnCostResourceAmountArray: []
