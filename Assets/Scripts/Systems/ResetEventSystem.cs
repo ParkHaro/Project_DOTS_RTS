@@ -42,7 +42,7 @@ namespace DotsRts.Systems
                 OnHealthDeadEntityList = _onHealthDeadEntityList.AsParallelWriter(),
             }.ScheduleParallel(state.Dependency).Complete();
 
-            DOTSEventsManager.Instance.TriggerOnHealthDead(_onHealthDeadEntityList);
+            DOTSEventsManager.Instance?.TriggerOnHealthDead(_onHealthDeadEntityList);
             
             _onBarracksUnitQueueChangedEntityList.Clear();
             new ResetBuildingBarracksEventsJob
@@ -50,7 +50,7 @@ namespace DotsRts.Systems
                 OnUnitQueueChangedEntityList = _onBarracksUnitQueueChangedEntityList.AsParallelWriter(),
             }.ScheduleParallel(state.Dependency).Complete();
 
-            DOTSEventsManager.Instance.TriggerOnBarracksUnitQueueChanged(_onBarracksUnitQueueChangedEntityList);
+            DOTSEventsManager.Instance?.TriggerOnBarracksUnitQueueChanged(_onBarracksUnitQueueChangedEntityList);
 
             state.Dependency = JobHandle.CombineDependencies(_jobHandleNativeArray);
         }

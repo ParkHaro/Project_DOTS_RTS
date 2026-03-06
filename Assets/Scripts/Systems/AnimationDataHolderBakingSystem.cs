@@ -10,6 +10,11 @@ namespace DotsRts.Systems
     [UpdateInGroup(typeof(PostBakingSystemGroup))]
     public partial struct AnimationDataHolderBakingSystem : ISystem
     {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<AnimationDataHolderObjectData>();
+        }
+        
         public void OnUpdate(ref SystemState state)
         {
             AnimationDataListSO animationDataListSo = null;
