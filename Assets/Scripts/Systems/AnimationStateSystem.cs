@@ -1,7 +1,6 @@
 ﻿using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Debug = UnityEngine.Debug;
 
 namespace DotsRts.Systems
 {
@@ -10,6 +9,7 @@ namespace DotsRts.Systems
     {
         private ComponentLookup<ActiveAnimation> ActiveAnimationComponentLookup;
 
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             ActiveAnimationComponentLookup = state.GetComponentLookup<ActiveAnimation>(false);
@@ -41,6 +41,7 @@ namespace DotsRts.Systems
         }
     }
 
+    [BurstCompile]
     public partial struct IdleWalkingAnimationStateJob : IJobEntity
     {
         [NativeDisableParallelForRestriction] public ComponentLookup<ActiveAnimation> ActiveAnimationComponentLookup;
@@ -61,7 +62,8 @@ namespace DotsRts.Systems
             }
         }
     }
-
+    
+    [BurstCompile]
     public partial struct AimShootAnimationStateJob : IJobEntity
     {
         [NativeDisableParallelForRestriction] public ComponentLookup<ActiveAnimation> ActiveAnimationComponentLookup;
@@ -86,6 +88,7 @@ namespace DotsRts.Systems
         }
     }
 
+    [BurstCompile]
     public partial struct MeleeAttackAnimationStateJob : IJobEntity
     {
         [NativeDisableParallelForRestriction] public ComponentLookup<ActiveAnimation> ActiveAnimationComponentLookup;

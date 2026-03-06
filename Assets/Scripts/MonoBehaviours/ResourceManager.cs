@@ -49,7 +49,7 @@ namespace DotsRts.MonoBehaviours
         {
             foreach (var resourceAmount in resourceAmountArray)
             {
-                if (!CanSpendResourceAmount(resourceAmount))
+                if (_resourceTypeAmountDict[resourceAmount.ResourceType] < resourceAmount.Amount)
                 {
                     return false;
                 }
@@ -68,7 +68,7 @@ namespace DotsRts.MonoBehaviours
         {
             foreach (var resourceAmount in resourceAmountArray)
             {
-                SpendResourceAmount(resourceAmount);
+                _resourceTypeAmountDict[resourceAmount.ResourceType] -= resourceAmount.Amount;
             }
 
             OnResourceAmountChanged?.Invoke(this, EventArgs.Empty);

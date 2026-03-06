@@ -28,7 +28,7 @@ namespace DotsRts.Systems
             FlowFieldPathRequestComponentLookup = SystemAPI.GetComponentLookup<FlowFieldPathRequest>(false);
             FlowFieldFollowerComponentLookup = SystemAPI.GetComponentLookup<FlowFieldFollower>(false);
             MoveOverrideComponentLookup = SystemAPI.GetComponentLookup<MoveOverride>(false);
-            GridNodeComponentLookup = SystemAPI.GetComponentLookup<GridSystem.GridNode>(true);
+            GridNodeComponentLookup = SystemAPI.GetComponentLookup<GridSystem.GridNode>(false);
         }
 
 
@@ -53,12 +53,19 @@ namespace DotsRts.Systems
                 Width = gridSystemData.Width,
                 Height = gridSystemData.Height,
                 GridNodeSize = gridSystemData.GridNodeSize,
-                TargetPositionPathQueuedComponentLookup = TargetPositionPathQueuedComponentLookup,
                 FlowFieldPathRequestComponentLookup = FlowFieldPathRequestComponentLookup,
                 FlowFieldFollowerComponentLookup = FlowFieldFollowerComponentLookup,
-                MoveOverrideComponentLookup = MoveOverrideComponentLookup
+                MoveOverrideComponentLookup = MoveOverrideComponentLookup,
+                TargetPositionPathQueuedComponentLookup = TargetPositionPathQueuedComponentLookup
             };
             targetPositionPathQueuedJob.ScheduleParallel();
+            
+            var testCanMoveStraightJob = new TestCanMoveStraightJob
+            {
+                CollisionWorld = collisionWorld,
+                FlowFieldFollowerComponentLookup = FlowFieldFollowerComponentLookup
+            };
+            testCanMoveStraightJob.ScheduleParallel();
             
             var flowFieldFollowerJob = new FlowFieldFollowerJob
             {
@@ -71,13 +78,6 @@ namespace DotsRts.Systems
                 GridNodeComponentLookup = GridNodeComponentLookup,
             };
             flowFieldFollowerJob.ScheduleParallel();
-
-            var testCanMoveStraightJob = new TestCanMoveStraightJob
-            {
-                CollisionWorld = collisionWorld,
-                FlowFieldFollowerComponentLookup = FlowFieldFollowerComponentLookup
-            };
-            testCanMoveStraightJob.ScheduleParallel();
             
             var unitMoverJob = new UnitMoverJob
             {
@@ -109,10 +109,13 @@ namespace DotsRts.Systems
             }
 
             unitMover.IsMoving = true;
-            moveDirection = math.normalizesafe(moveDirection);
+            
+            moveDirection = math.normalize(moveDirection);
+            
             localTransform.Rotation = math.slerp(localTransform.Rotation,
                 quaternion.LookRotation(moveDirection, math.up()),
                 DeltaTime * unitMover.RotationSpeed);
+            
             physicsVelocity.Linear = moveDirection * unitMover.MoveSpeed;
             physicsVelocity.Angular = float3.zero;
         }
@@ -250,8 +253,7 @@ namespace DotsRts.Systems
         {
             var flowFieldFollower = FlowFieldFollowerComponentLookup[entity];
 
-            var gridPosition = GridSystem.GetGridPosition(localTransform.Position,
-                GridNodeSize);
+            var gridPosition = GridSystem.GetGridPosition(localTransform.Position, GridNodeSize);
             var index = GridSystem.CalculateIndex(gridPosition, Width);
             var totalCount = Width * Height;
             var gridNodeEntity = TotalGridMapEntityArray[totalCount * flowFieldFollower.GridIndex + index];
@@ -269,7 +271,7 @@ namespace DotsRts.Systems
 
             unitMover.TargetPosition =
                 GridSystem.GetWorldCenterPosition(gridPosition.x, gridPosition.y, GridNodeSize) +
-                gridNodeMoveVector * (GridNodeSizeDouble);
+                gridNodeMoveVector * GridNodeSizeDouble;
 
             if (math.distance(localTransform.Position, flowFieldFollower.TargetPosition) < GridNodeSize)
             {

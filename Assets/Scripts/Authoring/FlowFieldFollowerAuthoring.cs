@@ -11,7 +11,10 @@ namespace DotsRts
             public override void Bake(FlowFieldFollowerAuthoring authoring)
             {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
-                AddComponent<FlowFieldFollower>(entity);
+                AddComponent<FlowFieldFollower>(entity, new FlowFieldFollower
+                {
+                    LastMoveVector = new float3(0, 0, 1)
+                });
                 SetComponentEnabled<FlowFieldFollower>(entity, false);
             }
         }

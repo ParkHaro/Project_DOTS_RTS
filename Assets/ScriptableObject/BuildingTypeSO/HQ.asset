@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: HQ
   m_EditorClassIdentifier: Assembly-CSharp::DotsRts.BuildingTypeSO
   BuildingType: 4
-  Prefab: {fileID: 251481089882971211, guid: b0c879ac796710f44b6d7f39911500c7, type: 3}
+  BuildingConstructionTimerMax: 0
+  ConstructionYOffset: 0
+  Prefab: {fileID: 0}
   BuildingDistanceMin: 0
   ShowInBuildingPlacementManagerUI: 0
   Sprite: {fileID: 0}
   VisualPrefab: {fileID: 0}
+  BuildCostResourceAmountArray: []

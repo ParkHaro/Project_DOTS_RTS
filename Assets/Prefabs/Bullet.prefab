@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1b10ae3fe7b4062b9d63c3f7cd28bf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DotsRts.TargetAuthoring
-  TargetGameObject: {fileID: 8181397551560425035, guid: f3911db186cd4ca419e732287f79a586, type: 3}
+  TargetGameObject: {fileID: 0}
 --- !u!114 &7069016876063320951
 MonoBehaviour:
   m_ObjectHideFlags: 0

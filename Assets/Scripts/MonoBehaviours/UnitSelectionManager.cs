@@ -39,7 +39,7 @@ namespace DotsRts.MonoBehaviours
             if (Input.GetMouseButtonDown(0))
             {
                 _selectionStartMousePosition = Input.mousePosition;
-                Debug.Log("Selection started at: " + _selectionStartMousePosition);
+                
                 OnSelectionAreaStart?.Invoke(this, EventArgs.Empty);
             }
 
@@ -65,6 +65,7 @@ namespace DotsRts.MonoBehaviours
                 var selectionAreaSize = selectionAreaRect.width + selectionAreaRect.height;
                 var multipleSelectionSizeMin = 40f;
                 var isMultipleSelection = selectionAreaSize > multipleSelectionSizeMin;
+                
                 if (isMultipleSelection)
                 {
                     entityQuery = new EntityQueryBuilder(Allocator.Temp)

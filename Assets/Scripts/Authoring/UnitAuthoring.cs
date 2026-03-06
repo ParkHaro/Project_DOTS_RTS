@@ -5,8 +5,6 @@ namespace DotsRts
 {
     public class UnitAuthoring : MonoBehaviour
     {
-        public FactionType _factionType;
-
         private class UnitAuthoringBaker : Baker<UnitAuthoring>
         {
             public override void Bake(UnitAuthoring authoring)

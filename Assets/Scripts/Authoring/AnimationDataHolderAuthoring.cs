@@ -22,11 +22,7 @@ namespace DotsRts
                 foreach (AnimationType animationType in System.Enum.GetValues(typeof(AnimationType)))
                 {
                     var animationDataSO = authoring.AnimationDataListSO.GetAnimationDataSO(animationType);
-                    if (animationDataSO == null)
-                    {
-                        continue;
-                    }
-                    
+
                     for (int i = 0; i < animationDataSO.MeshArray.Length; i++)
                     {
                         var mesh = animationDataSO.MeshArray[i];

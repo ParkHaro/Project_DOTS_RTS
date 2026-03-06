@@ -78,8 +78,9 @@ namespace DotsRts.Systems
     [BurstCompile]
     public partial struct HealthBarJob : IJobEntity
     {
-        [NativeDisableParallelForRestriction] public ComponentLookup<LocalTransform> LocalTransformLookup;
         [ReadOnly] public ComponentLookup<Health> HealthLookup;
+
+        [NativeDisableParallelForRestriction] public ComponentLookup<LocalTransform> LocalTransformLookup;
         [NativeDisableParallelForRestriction] public ComponentLookup<PostTransformMatrix> PostTransformMatrixLookup;
 
         public float3 CameraForward;

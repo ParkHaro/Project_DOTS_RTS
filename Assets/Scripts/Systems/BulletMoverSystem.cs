@@ -3,12 +3,12 @@ using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using Debug = UnityEngine.Debug;
 
 namespace DotsRts.Systems
 {
     public partial struct BulletMoverSystem : ISystem
     {
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
@@ -48,13 +48,13 @@ namespace DotsRts.Systems
 
                 var distanceAfterSq = math.distancesq(localTransform.ValueRO.Position, targetPosition);
 
-                if (distanceBeforeSq < distanceAfterSq)
+                if (distanceAfterSq > distanceBeforeSq)
                 {
                     localTransform.ValueRW.Position = targetPosition;
                 }
                 
-                var destroyAfterSq = .2f;
-                if (math.distancesq(localTransform.ValueRO.Position, targetPosition) < destroyAfterSq)
+                var destroyDistanceSq = .2f;
+                if (math.distancesq(localTransform.ValueRO.Position, targetPosition) < destroyDistanceSq)
                 {
                     var targetHealth = SystemAPI.GetComponentRW<Health>(target.ValueRO.TargetEntity);
                     targetHealth.ValueRW.HealthAmount -= bullet.ValueRO.DamageAmount;

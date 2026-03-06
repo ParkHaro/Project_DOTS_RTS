@@ -92,7 +92,7 @@ namespace DotsRts.MonoBehaviours
                         var buildingConstructionVisualEntity =
                             entityManager.Instantiate(_buildingTypeSo.GetVisualPrefabEntity(entitiesReferences));
                         entityManager.SetComponentData(buildingConstructionVisualEntity,
-                            LocalTransform.FromPosition(mouseWorldPosition));
+                            LocalTransform.FromPosition(mouseWorldPosition + new Vector3(0, _buildingTypeSo.ConstructionYOffset, 0)));
 
                         var buildingConstructionEntity =
                             entityManager.Instantiate(entitiesReferences.BuildingConstructionPrefabEntity);

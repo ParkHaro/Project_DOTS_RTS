@@ -159,7 +159,6 @@ namespace DotsRts.Systems
 
                 var gridIndex = gridSystemData.NextGridIndex;
                 gridSystemData.NextGridIndex = (gridSystemData.NextGridIndex + 1) % FLOW_FIELD_MAP_COUNT;
-                SystemAPI.SetComponent(state.SystemHandle, gridSystemData);
 
                 // Debug.Log($"Calculating Path to {targetGridPosition} :: {gridIndex}");
                 flowFieldFollower.ValueRW.GridIndex = gridIndex;
@@ -419,8 +418,8 @@ namespace DotsRts.Systems
         public static int2 GetGridPosition(float3 worldPosition, float gridNodeSize)
         {
             return new int2(
-                (int)(math.floor(worldPosition.x / gridNodeSize)),
-                (int)(math.floor(worldPosition.z / gridNodeSize))
+                (int)math.floor(worldPosition.x / gridNodeSize),
+                (int)math.floor(worldPosition.z / gridNodeSize)
             );
         }
 

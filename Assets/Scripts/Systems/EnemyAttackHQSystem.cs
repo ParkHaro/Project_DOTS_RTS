@@ -6,6 +6,11 @@ namespace DotsRts.Systems
 {
     public partial struct EnemyAttackHQSystem : ISystem
     {
+        public void OnCreate(ref SystemState state)
+        {
+            state.RequireForUpdate<BuildingHQ>();
+        }
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
@@ -26,7 +31,7 @@ namespace DotsRts.Systems
                 {
                     continue;
                 }
-
+                
                 targetPositionPathQueued.ValueRW.TargetPosition = hqPosition;
                 targetPositionPathQueuedEnabled.ValueRW = true;
             }

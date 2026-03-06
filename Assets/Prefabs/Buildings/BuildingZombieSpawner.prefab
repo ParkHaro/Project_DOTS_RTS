@@ -193,8 +193,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e4b3a0fca65492d9e2c895effeb197d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DotsRts.ZombieSpawnerAuthoring
-  TimerMax: 1.5
-  RandomWalkingDistanceMin: 5
+  TimerMax: 1
+  RandomWalkingDistanceMin: 4
   RandomWalkingDistanceMax: 10
   NearbyZombieAmountMax: 4
   NearbyZombieAmountDistance: 15

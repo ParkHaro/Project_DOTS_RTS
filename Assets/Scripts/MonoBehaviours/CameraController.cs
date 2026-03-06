@@ -24,22 +24,22 @@ namespace DotsRts.MonoBehaviours
 
             if (Input.GetKey(KeyCode.W))
             {
-                moveDir.z += 1;
+                moveDir.z = +1;
             }
 
             if (Input.GetKey(KeyCode.S))
             {
-                moveDir.z -= 1;
+                moveDir.z = -1;
             }
 
             if (Input.GetKey(KeyCode.A))
             {
-                moveDir.x -= 1;
+                moveDir.x = -1;
             }
 
             if (Input.GetKey(KeyCode.D))
             {
-                moveDir.x += 1;
+                moveDir.x = +1;
             }
 
             var mainTransform = Camera.main.transform;
@@ -53,12 +53,12 @@ namespace DotsRts.MonoBehaviours
             var rotationAmount = 0f;
             if (Input.GetKey(KeyCode.Q))
             {
-                rotationAmount += 1f;
+                rotationAmount = +1f;
             }
 
             if (Input.GetKey(KeyCode.E))
             {
-                rotationAmount -= 1f;
+                rotationAmount = -1f;
             }
 
             var rotationSpeed = 200f;

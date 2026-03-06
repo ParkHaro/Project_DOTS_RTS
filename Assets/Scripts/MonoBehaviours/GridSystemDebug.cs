@@ -85,8 +85,6 @@ namespace DotsRts.MonoBehaviours
                                     Vector3.up));
                         }
                     }
-
-                    // gridSystemDebugSingle.SetColor(gridNode.Data == 0 ? Color.white : Color.blue);
                 }
             }
         }

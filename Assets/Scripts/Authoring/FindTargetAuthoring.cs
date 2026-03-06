@@ -17,7 +17,7 @@ namespace DotsRts
                 AddComponent(entity, new FindTarget
                 {
                     Range = authoring.Range,
-                    TargetFactionType = authoring._targetFactionType,
+                    TargetFaction = authoring._targetFactionType,
                     TimerMax = authoring.TimerMax,
                 });
             }
@@ -27,7 +27,7 @@ namespace DotsRts
     public struct FindTarget : IComponentData
     {
         public float Range;
-        public FactionType TargetFactionType;
+        public FactionType TargetFaction;
         public float Timer;
         public float TimerMax;
     }

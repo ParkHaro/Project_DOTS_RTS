@@ -31,8 +31,8 @@ namespace DotsRts.Systems
                 }
 
                 var targetLocalTransform = SystemAPI.GetComponent<LocalTransform>(target.ValueRO.TargetEntity);
-                if (math.distance(localTransform.ValueRO.Position, targetLocalTransform.Position) >
-                    loseTarget.ValueRO.LoseTargetDistance)
+                var targetDistance = math.distance(localTransform.ValueRO.Position, targetLocalTransform.Position);
+                if (targetDistance > loseTarget.ValueRO.LoseTargetDistance)
                 {
                     target.ValueRW.TargetEntity = Entity.Null;
                 }

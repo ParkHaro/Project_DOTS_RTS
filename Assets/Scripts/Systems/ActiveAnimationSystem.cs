@@ -6,6 +6,7 @@ namespace DotsRts.Systems
 {
     public partial struct ActiveAnimationSystem : ISystem
     {
+        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<AnimationDataHolder>();
@@ -25,6 +26,7 @@ namespace DotsRts.Systems
         }
     }
 
+    [BurstCompile]
     public partial struct ActiveAnimationJob : IJobEntity
     {
         public float DeltaTime;

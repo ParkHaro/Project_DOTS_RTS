@@ -22,7 +22,7 @@ namespace DotsRts.Systems
                          RefRW<ShootLight>>().WithEntityAccess())
             {
                 shootLight.ValueRW.Timer -= SystemAPI.Time.DeltaTime;
-                if (shootLight.ValueRO.Timer <= 0f)
+                if (shootLight.ValueRO.Timer < 0f)
                 {
                     entityCommandBuffer.DestroyEntity(entity);
                 }

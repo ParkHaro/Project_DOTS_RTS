@@ -18,7 +18,7 @@ namespace DotsRts.Systems
                          RefRW<RandomWalking>,
                          RefRW<TargetPositionPathQueued>,
                          EnabledRefRW<TargetPositionPathQueued>,
-                         RefRO<LocalTransform>>())
+                         RefRO<LocalTransform>>().WithPresent<TargetPositionPathQueued>())
             {
                 if (math.distancesq(localTransform.ValueRO.Position, randomWalking.ValueRO.TargetPosition)
                     < UnitMoverSystem.REACHED_TARGET_POSITION_DISTANCE_SQ)

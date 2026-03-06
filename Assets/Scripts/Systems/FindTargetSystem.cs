@@ -1,4 +1,5 @@
-﻿using DotsRts.MonoBehaviours;
+﻿using System.Diagnostics;
+using DotsRts.MonoBehaviours;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -77,7 +78,7 @@ namespace DotsRts.Systems
                         }
 
                         var targetFaction = SystemAPI.GetComponent<Faction>(distanceHit.Entity);
-                        if (targetFaction.FactionType == findTarget.ValueRO.TargetFactionType)
+                        if (targetFaction.FactionType == findTarget.ValueRO.TargetFaction)
                         {
                             if (closestTargetEntity == Entity.Null)
                             {
@@ -92,13 +93,13 @@ namespace DotsRts.Systems
                                     closestTargetDistance = distanceHit.Distance;
                                 }
                             }
-
-                            if (closestTargetEntity != Entity.Null)
-                            {
-                                target.ValueRW.TargetEntity = closestTargetEntity;
-                            }
                         }
                     }
+                }
+
+                if (closestTargetEntity != Entity.Null)
+                {
+                    target.ValueRW.TargetEntity = closestTargetEntity;
                 }
             }
         }

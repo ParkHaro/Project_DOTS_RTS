@@ -13,6 +13,7 @@ namespace DotsRts.Systems
     {
         public void OnCreate(ref SystemState state)
         {
+            state.RequireForUpdate<PhysicsWorldSingleton>();
             state.RequireForUpdate<EntitiesReferences>();
             state.RequireForUpdate<EndSimulationEntityCommandBufferSystem.Singleton>();
         }
@@ -43,6 +44,7 @@ namespace DotsRts.Systems
 
                 zombieSpawner.ValueRW.Timer = zombieSpawner.ValueRO.TimerMax;
 
+                distanceHitList.Clear();
                 var collisionFilter = new CollisionFilter
                 {
                     BelongsTo = ~0u,
@@ -75,8 +77,7 @@ namespace DotsRts.Systems
                 }
 
                 var zombieEntity = state.EntityManager.Instantiate(entitiesReferences.ZombiePrefabEntity);
-                state.EntityManager.SetComponentData(zombieEntity,
-                    LocalTransform.FromPosition(localTransform.ValueRO.Position));
+                SystemAPI.SetComponent(zombieEntity, LocalTransform.FromPosition(localTransform.ValueRO.Position));
 
                 entityCommandBuffer.AddComponent(zombieEntity, new RandomWalking
                 {
