@@ -7,7 +7,7 @@ namespace DotsRts.Systems
 {
     public partial struct BuildingHarvesterSystem : ISystem
     {
-        [BurstCompile]
+        // [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             foreach (var buildingHarvester

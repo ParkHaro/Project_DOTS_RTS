@@ -55,8 +55,8 @@ namespace DotsRts.Systems
         {
             state.RequireForUpdate<PhysicsWorldSingleton>();
 
-            var width = 20;
-            var height = 10;
+            var width = 40;
+            var height = 40;
             var gridNodeSize = 5f;
             var totalCount = width * height;
 
