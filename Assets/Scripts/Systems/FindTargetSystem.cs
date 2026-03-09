@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using DotsRts.MonoBehaviours;
+﻿using DotsRts.MonoBehaviours;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -11,9 +10,17 @@ namespace DotsRts.Systems
 {
     public partial struct FindTargetSystem : ISystem
     {
+        private ComponentLookup<LocalTransform> _localTransformComponentLookup;
+        private ComponentLookup<Faction> _factionComponentLookup;
+        private EntityStorageInfoLookup _entityStorageInfoLookup;
+
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<PhysicsWorldSingleton>();
+
+            _localTransformComponentLookup = state.GetComponentLookup<LocalTransform>(true);
+            _factionComponentLookup = state.GetComponentLookup<Faction>(true);
+            _entityStorageInfoLookup = state.GetEntityStorageInfoLookup();
         }
 
         [BurstCompile]
@@ -21,87 +28,107 @@ namespace DotsRts.Systems
         {
             var physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
             var collisionWorld = physicsWorldSingleton.CollisionWorld;
-            var distanceHitList = new NativeList<DistanceHit>(Allocator.Temp);
+            _localTransformComponentLookup.Update(ref state);
+            _factionComponentLookup.Update(ref state);
+            _entityStorageInfoLookup.Update(ref state);
 
-            foreach (var (localTransform,
-                         findTarget,
-                         target,
-                         targetOverride)
-                     in SystemAPI.Query<
-                         RefRO<LocalTransform>,
-                         RefRW<FindTarget>,
-                         RefRW<Target>,
-                         RefRO<TargetOverride>>())
+            var findTargetJob = new FindTargetJob
             {
-                findTarget.ValueRW.Timer -= SystemAPI.Time.DeltaTime;
-                if (findTarget.ValueRO.Timer > 0f)
-                {
-                    continue;
-                }
+                LocalTransformComponentLookup = _localTransformComponentLookup,
+                FactionComponentLookup = _factionComponentLookup,
+                EntityStorageInfoLookup = _entityStorageInfoLookup,
+                CollisionWorld = collisionWorld,
+                DeltaTime = SystemAPI.Time.DeltaTime,
+            };
+            findTargetJob.ScheduleParallel();
+        }
+    }
 
-                findTarget.ValueRW.Timer = findTarget.ValueRO.TimerMax;
-                if (targetOverride.ValueRO.TargetEntity != Entity.Null)
-                {
-                    target.ValueRW.TargetEntity = targetOverride.ValueRO.TargetEntity;
-                    continue;
-                }
+    [BurstCompile]
+    public partial struct FindTargetJob : IJobEntity
+    {
+        [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformComponentLookup;
+        [ReadOnly] public ComponentLookup<Faction> FactionComponentLookup;
+        [ReadOnly] public EntityStorageInfoLookup EntityStorageInfoLookup;
+        [ReadOnly] public CollisionWorld CollisionWorld;
+        public float DeltaTime;
 
-                distanceHitList.Clear();
-                var collisionFilter = new CollisionFilter
-                {
-                    BelongsTo = ~0u,
-                    CollidesWith = 1u << GameAssets.UNITS_LAYER | 1u << GameAssets.BUILDINGS_LAYER,
-                    GroupIndex = 0,
-                };
+        public void Execute(
+            in LocalTransform localTransform,
+            ref FindTarget findTarget,
+            ref Target target,
+            in TargetOverride targetOverride)
+        {
+            findTarget.Timer -= DeltaTime;
+            if (findTarget.Timer > 0f)
+            {
+                return;
+            }
 
-                var closestTargetEntity = Entity.Null;
-                var closestTargetDistance = float.MaxValue;
-                var currentTargetDistanceOffset = 0f;
-                if (target.ValueRO.TargetEntity != Entity.Null)
-                {
-                    closestTargetEntity = target.ValueRO.TargetEntity;
-                    var targetLocalTransform = SystemAPI.GetComponent<LocalTransform>(target.ValueRO.TargetEntity);
-                    closestTargetDistance =
-                        math.distance(localTransform.ValueRO.Position, targetLocalTransform.Position);
-                    currentTargetDistanceOffset = 2f;
-                }
+            findTarget.Timer += findTarget.TimerMax;
+            if (targetOverride.TargetEntity != Entity.Null)
+            {
+                target.TargetEntity = targetOverride.TargetEntity;
+                return;
+            }
 
-                if (collisionWorld.OverlapSphere(localTransform.ValueRO.Position,
-                        findTarget.ValueRO.Range, ref distanceHitList, collisionFilter))
+            var distanceHitList = new NativeList<DistanceHit>(Allocator.TempJob);
+            var collisionFilter = new CollisionFilter
+            {
+                BelongsTo = ~0u,
+                CollidesWith = 1u << GameAssets.UNITS_LAYER | 1u << GameAssets.BUILDINGS_LAYER,
+                GroupIndex = 0,
+            };
+
+            var closestTargetEntity = Entity.Null;
+            var closestTargetDistance = float.MaxValue;
+            var currentTargetDistanceOffset = 0f;
+            if (target.TargetEntity != Entity.Null)
+            {
+                closestTargetEntity = target.TargetEntity;
+                var targetLocalTransform = LocalTransformComponentLookup[target.TargetEntity];
+                closestTargetDistance =
+                    math.distance(localTransform.Position, targetLocalTransform.Position);
+                currentTargetDistanceOffset = 2f;
+            }
+
+            if (CollisionWorld.OverlapSphere(localTransform.Position,
+                    findTarget.Range, ref distanceHitList, collisionFilter))
+            {
+                foreach (var distanceHit in distanceHitList)
                 {
-                    foreach (var distanceHit in distanceHitList)
+                    if (!EntityStorageInfoLookup.Exists(distanceHit.Entity) ||
+                        !FactionComponentLookup.HasComponent(distanceHit.Entity))
                     {
-                        if (!SystemAPI.Exists(distanceHit.Entity) ||
-                            !SystemAPI.HasComponent<Faction>(distanceHit.Entity))
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        var targetFaction = SystemAPI.GetComponent<Faction>(distanceHit.Entity);
-                        if (targetFaction.FactionType == findTarget.ValueRO.TargetFaction)
+                    var targetFaction = FactionComponentLookup[distanceHit.Entity];
+                    if (targetFaction.FactionType == findTarget.TargetFaction)
+                    {
+                        if (closestTargetEntity == Entity.Null)
                         {
-                            if (closestTargetEntity == Entity.Null)
+                            closestTargetEntity = distanceHit.Entity;
+                            closestTargetDistance = distanceHit.Distance;
+                        }
+                        else
+                        {
+                            if (distanceHit.Distance + currentTargetDistanceOffset < closestTargetDistance)
                             {
                                 closestTargetEntity = distanceHit.Entity;
                                 closestTargetDistance = distanceHit.Distance;
                             }
-                            else
-                            {
-                                if (distanceHit.Distance + currentTargetDistanceOffset < closestTargetDistance)
-                                {
-                                    closestTargetEntity = distanceHit.Entity;
-                                    closestTargetDistance = distanceHit.Distance;
-                                }
-                            }
                         }
                     }
                 }
-
-                if (closestTargetEntity != Entity.Null)
-                {
-                    target.ValueRW.TargetEntity = closestTargetEntity;
-                }
             }
+
+            if (closestTargetEntity != Entity.Null)
+            {
+                target.TargetEntity = closestTargetEntity;
+            }
+
+            distanceHitList.Dispose();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Unity.Entities;
+using Unity.Rendering;
 using UnityEngine;
 
 namespace DotsRts
@@ -15,10 +16,13 @@ namespace DotsRts
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent(entity, new VisualUnderFogOfWar
                 {
-                    IsVisible = true,
+                    IsVisible = false,
                     ParentEntity = GetEntity(authoring.ParentGameObject, TransformUsageFlags.Dynamic),
-                    SphereCastSize = authoring.SphereCastSize
+                    SphereCastSize = authoring.SphereCastSize,
+                    Timer = 0f,
+                    TimerMax = 0.2f,
                 });
+                AddComponent(entity, new DisableRendering());
             }
         }
     }
@@ -28,5 +32,7 @@ namespace DotsRts
         public bool IsVisible;
         public Entity ParentEntity;
         public float SphereCastSize;
+        public float Timer;
+        public float TimerMax;
     }
 }

@@ -12,7 +12,7 @@ namespace DotsRts.Systems
     public partial struct VisualUnderFogOfWarSystem : ISystem
     {
         private ComponentLookup<LocalTransform> _localTransformComponentLookup;
-        
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -34,15 +34,16 @@ namespace DotsRts.Systems
                 .CreateCommandBuffer(state.WorldUnmanaged);
 
             _localTransformComponentLookup.Update(ref state);
-            
+
             var visualUnderFogOfWarJob = new VisualUnderFogOfWarJob
             {
                 CollisionWorld = collisionWorld,
                 EntityCommandBuffer = entityCommandBuffer.AsParallelWriter(),
                 LocalTransformComponentLookup = _localTransformComponentLookup,
+                DeltaTime = SystemAPI.Time.DeltaTime,
             };
             visualUnderFogOfWarJob.ScheduleParallel();
-            
+
             /*
             foreach (var (visualUnderFogOfWar,
                          entity)
@@ -89,11 +90,21 @@ namespace DotsRts.Systems
         {
             [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformComponentLookup;
             [ReadOnly] public CollisionWorld CollisionWorld;
-            
+
             public EntityCommandBuffer.ParallelWriter EntityCommandBuffer;
-            
-            public void Execute(ref VisualUnderFogOfWar visualUnderFogOfWar, [ChunkIndexInQuery] int chunkIndexQuery, Entity entity)
+            public float DeltaTime;
+
+            public void Execute(ref VisualUnderFogOfWar visualUnderFogOfWar, [ChunkIndexInQuery] int chunkIndexQuery,
+                Entity entity)
             {
+                visualUnderFogOfWar.Timer -= DeltaTime;
+                if (visualUnderFogOfWar.Timer > 0f)
+                {
+                    return;
+                }
+
+                visualUnderFogOfWar.Timer += visualUnderFogOfWar.TimerMax;
+
                 var parentLocalTransform = LocalTransformComponentLookup[visualUnderFogOfWar.ParentEntity];
 
                 if (!CollisionWorld.SphereCast(
